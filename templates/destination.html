@@ -30,46 +30,46 @@
     nav {
       position: fixed; top: 0; left: 0; right: 0; z-index: 100;
       display: flex; align-items: center; justify-content: space-between;
-      padding: 0 48px;
-      height: 64px;
-      background: rgba(255,255,255,0.95);
+      padding: 0 56px;
+      height: 128px;
+      background: linear-gradient(135deg, var(--teal-dark) 0%, var(--teal) 58%, var(--gold) 100%);
       backdrop-filter: blur(8px);
-      border-bottom: 1px solid rgba(0,0,0,0.06);
+      border-bottom: 1px solid rgba(255,255,255,0.24);
+      box-shadow: 0 10px 28px rgba(14, 42, 56, 0.18);
     }
-    .nav-logo { display: flex; flex-direction: column; line-height: 1; cursor: pointer; }
-    .nav-logo .en {
-      font-family: 'Playfair Display', serif;
-      font-size: 20px; font-weight: 700;
-      color: var(--teal-dark);
+    .nav-logo { display: flex; align-items: center; line-height: 1; cursor: pointer; }
+    .nav-logo img {
+      width: 250px;
+      height: 112px;
+      object-fit: contain;
     }
-    .nav-logo .np { font-size: 11px; color: var(--gold); }
     .nav-links { display: flex; gap: 32px; list-style: none; }
     .nav-links a {
       text-decoration: none; font-size: 14px; font-weight: 500;
-      color: var(--dark); opacity: 0.75;
+      color: var(--white); opacity: 0.86;
       transition: opacity 0.2s;
       padding-bottom: 4px;
     }
-    .nav-links a:hover, .nav-links a.active { opacity: 1; color: var(--teal); border-bottom: 2px solid var(--teal); }
+    .nav-links a:hover, .nav-links a.active { opacity: 1; color: #ffe2a2; border-bottom: 2px solid #ffe2a2; }
     .btn-outline {
       padding: 8px 18px; border-radius: 6px;
-      border: 1.5px solid var(--teal); color: var(--teal);
+      border: 1.5px solid rgba(255,255,255,0.78); color: var(--white);
       background: transparent; font-size: 14px; font-weight: 500;
       cursor: pointer;
     }
-    .btn-outline:hover { background: var(--teal); color: var(--white); }
+    .btn-outline:hover { background: rgba(255,255,255,0.16); color: var(--white); }
     .btn-solid {
       padding: 8px 20px; border-radius: 6px;
-      background: var(--teal); color: var(--white);
+      background: var(--gold); color: #17323b;
       border: none; font-size: 14px; font-weight: 600;
       cursor: pointer;
     }
-    .btn-solid:hover { background: var(--teal-dark); }
+    .btn-solid:hover { background: #e0b556; }
 
     /* DESTINATIONS PAGE SPECIFIC STYLES */
     .page-header {
       background: linear-gradient(135deg, #0e2a38 0%, #1a5b6e 100%);
-      padding: 120px 48px 60px;
+      padding: 184px 48px 60px;
       text-align: center;
     }
     .page-header h1 {
@@ -294,16 +294,11 @@
       grid-template-columns: 2fr 1fr 1fr 1.5fr;
       gap: 48px;
     }
-    .footer-brand .logo-en {
-      font-family: 'Playfair Display', serif;
-      font-size: 22px;
-      font-weight: 700;
-      color: var(--white);
-    }
-    .footer-brand .logo-np {
-      font-size: 12px;
-      color: var(--gold);
-      margin-bottom: 12px;
+    .footer-brand-logo {
+      width: 220px;
+      height: 128px;
+      object-fit: contain;
+      margin-bottom: 18px;
     }
     .footer-col h4 {
       font-size: 13px;
@@ -355,14 +350,15 @@
     }
 
     @media (max-width: 900px) {
-      nav { padding: 0 20px; }
+      nav { height: 110px; padding: 0 20px; }
+      .nav-logo img { width: 195px; height: 96px; }
       .nav-links { display: none; }
       .dest-grid { grid-template-columns: 1fr; }
       .filter-section { padding: 20px; }
       .filter-container { flex-direction: column; }
       .footer-grid { grid-template-columns: 1fr; }
       .destinations-container { padding: 20px; }
-      .page-header { padding: 100px 20px 40px; }
+      .page-header { padding: 150px 20px 40px; }
     }
   </style>
 </head>
@@ -370,8 +366,7 @@
 
 <nav>
   <div class="nav-logo" onclick="window.location.href='index.html'">
-    <span class="en">Gantabya</span>
-    <span class="np">गन्तव्य</span>
+    <img src="{{ url_for('static', filename='Logo.jpg') }}" alt="Gantabya logo" />
   </div>
   <ul class="nav-links">
     <li><a href="index.html">Home</a></li>
@@ -431,8 +426,7 @@
 <footer>
   <div class="footer-grid">
     <div class="footer-brand">
-      <div class="logo-en">Gantabya</div>
-      <div class="logo-np">गन्तव्य</div>
+      <img class="footer-brand-logo" src="{{ url_for('static', filename='Logo.jpg') }}" alt="Gantabya logo" />
       <p>Premium travel experiences since 2014. Your trusted partner for extraordinary journeys around the globe.</p>
       <div class="footer-socials">
         <a href="#">f</a>

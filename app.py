@@ -384,6 +384,44 @@ def create_default_data():
     
     db.session.commit()
 
+@app.route("/profile")
+def profile():
+    customer = Customer.query.get(session['customer_id'])
+    bookings = Booking.query.filter_by(customer_email=customer.email).all()
+    inquiries = Inquiry.query.filter_by(email=customer.email).all()
+    return render_template("profile.html", customer=customer, bookings=bookings, inquiries=inquiries)
+
+@app.route("/submit_inquiry", methods=["POST"])
+def submit_inquiry():
+    name = request.form.get('name')
+    email = request.form.get('email')
+    phone = request.form.get('phone', '')
+    package_name = request.form.get('package_name', '')
+    departure_date = request.form.get('departure_date', '')
+    travelers = request.form.get('travelers', 1)
+    message = request.form.get('message', '')
+    
+    # Create new inquiry
+    inquiry = Inquiry(
+        name=name,
+        email=email,
+        phone=phone,
+        service_type="Package Inquiry",
+        destination=package_name,
+        departure_date=departure_date,
+        travelers=int(travelers) if travelers else 1,
+        message=f"Package: {package_name}\n\n{message}" if message else f"Package: {package_name}",
+        status="Pending"
+    )
+    
+    db.session.add(inquiry)
+    db.session.commit()
+    
+    flash("Thank you! Your inquiry has been sent. We'll contact you soon.", "success")
+    
+    # Redirect back to packages page
+    return redirect(url_for("packages"))
+
 # ==================== RUN APP ====================
 
 if __name__ == "__main__":

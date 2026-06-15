@@ -18,3 +18,501 @@
   Important:
   - This page should only be visible after customer login.
 -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My Profile - Gantabya</title>
+  <style>
+    /* Brand colors matching login/signup pages */
+    :root {
+      --teal: #064f63;
+      --teal-dark: #043b4d;
+      --gold: #c9a84c;
+      --ink: #0d1b2a;
+      --muted: #667085;
+      --line: #dfe5ee;
+      --panel: #ffffff;
+      --bg: #f6f8fb;
+      --success: #10b981;
+      --warning: #f59e0b;
+      --danger: #ef4444;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: Arial, Helvetica, sans-serif;
+      background: var(--bg);
+      color: var(--ink);
+    }
+
+    /* HEADER / NAVBAR */
+    nav {
+      min-height: 104px;
+      padding: 14px 48px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: rgba(255, 255, 255, 0.98);
+      border-bottom: 1px solid var(--line);
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    }
+
+    .logo img {
+      width: 220px;
+      height: 76px;
+      object-fit: contain;
+      display: block;
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 22px;
+      list-style: none;
+      margin: 0;
+      padding: 0;
+    }
+
+    .nav-links a {
+      color: var(--teal-dark);
+      font-size: 14px;
+      font-weight: 700;
+      text-decoration: none;
+    }
+
+    .nav-links a:hover { color: var(--gold); }
+
+    /* Welcome banner */
+    .welcome-banner {
+      background: linear-gradient(135deg, var(--teal-dark), var(--teal));
+      color: white;
+      padding: 40px 48px;
+    }
+
+    .welcome-banner h1 {
+      margin: 0 0 10px;
+      font-size: 32px;
+    }
+
+    .welcome-banner p {
+      margin: 0;
+      opacity: 0.9;
+    }
+
+    /* Main container */
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 40px 48px;
+    }
+
+    /* Profile grid: info + actions side by side */
+    .profile-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 30px;
+      margin-bottom: 50px;
+    }
+
+    /* Cards */
+    .card {
+      background: var(--panel);
+      border-radius: 12px;
+      border: 1px solid var(--line);
+      overflow: hidden;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    }
+
+    .card-header {
+      background: var(--bg);
+      padding: 18px 24px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .card-header h2 {
+      margin: 0;
+      font-size: 18px;
+      color: var(--teal-dark);
+    }
+
+    .card-body {
+      padding: 24px;
+    }
+
+    /* Info rows */
+    .info-row {
+      display: flex;
+      padding: 10px 0;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .info-label {
+      width: 120px;
+      font-weight: 700;
+      color: var(--muted);
+    }
+
+    .info-value {
+      flex: 1;
+      color: var(--ink);
+    }
+
+    /* Buttons */
+    .btn {
+      display: inline-block;
+      padding: 10px 20px;
+      border-radius: 8px;
+      text-decoration: none;
+      font-weight: 700;
+      font-size: 14px;
+      cursor: pointer;
+      border: none;
+      transition: all 0.2s;
+    }
+
+    .btn-primary {
+      background: var(--teal);
+      color: white;
+    }
+
+    .btn-primary:hover {
+      background: var(--teal-dark);
+    }
+
+    .btn-logout {
+      background: var(--danger);
+      color: white;
+    }
+
+    .btn-logout:hover {
+      background: #dc2626;
+    }
+
+    .btn-outline {
+      border: 1px solid var(--line);
+      background: white;
+      color: var(--teal);
+    }
+
+    .btn-outline:hover {
+      border-color: var(--teal);
+    }
+
+    /* Tables */
+    .table-container {
+      overflow-x: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    th, td {
+      padding: 14px 12px;
+      text-align: left;
+      border-bottom: 1px solid var(--line);
+    }
+
+    th {
+      background: var(--bg);
+      font-weight: 700;
+      color: var(--teal-dark);
+    }
+
+    .status {
+      display: inline-block;
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .status-pending {
+      background: #fef3c7;
+      color: #92400e;
+    }
+
+    .status-confirmed {
+      background: #d1fae5;
+      color: #065f46;
+    }
+
+    .status-completed {
+      background: #dbeafe;
+      color: #1e40af;
+    }
+
+    .status-cancelled {
+      background: #fee2e2;
+      color: #991b1b;
+    }
+
+    /* Empty state */
+    .empty-state {
+      text-align: center;
+      padding: 40px;
+      color: var(--muted);
+    }
+
+    /* Section title */
+    .section-title {
+      font-size: 24px;
+      margin: 0 0 20px 0;
+      color: var(--teal-dark);
+    }
+
+    /* Flash messages */
+    .flash {
+      padding: 12px 20px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      background: #fff7ed;
+      color: #9a3412;
+      border: 1px solid #fed7aa;
+    }
+
+    .flash.success {
+      background: #ecfdf5;
+      color: #065f46;
+      border-color: #a7f3d0;
+    }
+
+    /* Logout button container */
+    .logout-section {
+      text-align: right;
+      margin-bottom: 30px;
+    }
+
+    /* Mobile responsive */
+    @media (max-width: 900px) {
+      nav {
+        padding: 12px 18px;
+        flex-direction: column;
+        gap: 12px;
+      }
+      .logo img { width: 190px; height: 66px; }
+      .nav-links {
+        width: 100%;
+        justify-content: center;
+        flex-wrap: wrap;
+        gap: 14px;
+      }
+      .welcome-banner {
+        padding: 30px 20px;
+      }
+      .container {
+        padding: 20px;
+      }
+      .profile-grid {
+        grid-template-columns: 1fr;
+        gap: 20px;
+      }
+      .info-row {
+        flex-direction: column;
+      }
+      .info-label {
+        width: 100%;
+        margin-bottom: 5px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- HEADER / NAVBAR -->
+  <nav>
+    <a class="logo" href="{{ url_for('home') }}">
+      <img src="{{ url_for('static', filename='Logo.jpg') }}" alt="Gantabya logo">
+    </a>
+    <ul class="nav-links">
+      <li><a href="{{ url_for('home') }}">Home</a></li>
+      <li><a href="{{ url_for('destination') }}">Destinations</a></li>
+      <li><a href="{{ url_for('packages') }}">Packages</a></li>
+      <li><a href="{{ url_for('track_booking') }}">Track Booking</a></li>
+      <li><a href="{{ url_for('contact') }}">Contact</a></li>
+    </ul>
+  </nav>
+
+  <!-- WELCOME BANNER -->
+  <div class="welcome-banner">
+    <h1>Welcome, {{ customer.full_name }}! 👋</h1>
+    <p>Manage your profile, track bookings, and view inquiries</p>
+  </div>
+
+  <!-- MAIN CONTENT -->
+  <div class="container">
+    <!-- Flash Messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+          <div class="flash {% if category == 'success' %}success{% endif %}">{{ message }}</div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+
+    <!-- Logout Button -->
+    <div class="logout-section">
+      <a href="{{ url_for('logout') }}" class="btn btn-logout">🚪 Logout</a>
+    </div>
+
+    <!-- PROFILE GRID: Personal Info + Quick Actions -->
+    <div class="profile-grid">
+      <!-- Personal Information Card -->
+      <div class="card">
+        <div class="card-header">
+          <h2>📋 Personal Information</h2>
+        </div>
+        <div class="card-body">
+          <div class="info-row">
+            <div class="info-label">Full Name</div>
+            <div class="info-value">{{ customer.full_name }}</div>
+          </div>
+          <div class="info-row">
+            <div class="info-label">Email</div>
+            <div class="info-value">{{ customer.email }}</div>
+          </div>
+          <div class="info-row">
+            <div class="info-label">Phone</div>
+            <div class="info-value">{{ customer.phone or 'Not provided' }}</div>
+          </div>
+          <div class="info-row">
+            <div class="info-label">Address</div>
+            <div class="info-value">{{ customer.address or 'Not provided' }}</div>
+          </div>
+          <div class="info-row">
+            <div class="info-label">Member Since</div>
+            <div class="info-value">{{ customer.created_at.strftime('%B %d, %Y') if customer.created_at else 'Recently' }}</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Quick Actions Card -->
+      <div class="card">
+        <div class="card-header">
+          <h2>⚡ Quick Actions</h2>
+        </div>
+        <div class="card-body">
+          <a href="{{ url_for('packages') }}" class="btn btn-primary" style="display: block; text-align: center; margin-bottom: 12px;">
+            ✈️ Browse Packages
+          </a>
+          <a href="{{ url_for('contact') }}" class="btn btn-outline" style="display: block; text-align: center;">
+            📞 Contact Support
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- MY BOOKINGS SECTION -->
+    <h2 class="section-title">📅 My Bookings</h2>
+    <div class="card">
+      <div class="table-container">
+        {% if bookings and bookings|length > 0 %}
+          <table>
+            <thead>
+              <tr>
+                <th>Booking ID</th>
+                <th>Package</th>
+                <th>Travel Date</th>
+                <th>Travelers</th>
+                <th>Total Amount</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for booking in bookings %}
+              <tr>
+                <td>{{ booking.booking_number or '#' + booking.id|string }}</td>
+                <td>{{ booking.package_name }}</td>
+                <td>{{ booking.travel_date }}</td>
+                <td>{{ booking.travelers }}</td>
+                <td>₹{{ "%.2f"|format(booking.total_amount) }}</td>
+                <td>
+                  {% if booking.status == 'Pending' %}
+                    <span class="status status-pending">Pending</span>
+                  {% elif booking.status == 'Confirmed' %}
+                    <span class="status status-confirmed">Confirmed</span>
+                  {% elif booking.status == 'Completed' %}
+                    <span class="status status-completed">Completed</span>
+                  {% elif booking.status == 'Cancelled' %}
+                    <span class="status status-cancelled">Cancelled</span>
+                  {% else %}
+                    <span class="status status-pending">{{ booking.status }}</span>
+                  {% endif %}
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        {% else %}
+          <div class="empty-state">
+            <p>📭 You haven't made any bookings yet.</p>
+            <a href="{{ url_for('packages') }}" class="btn btn-primary" style="margin-top: 15px;">Browse Packages</a>
+          </div>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- MY INQUIRIES SECTION -->
+    <h2 class="section-title" style="margin-top: 40px;">📞 My Inquiries</h2>
+    <div class="card">
+      <div class="table-container">
+        {% if inquiries and inquiries|length > 0 %}
+          <table>
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Destination</th>
+                <th>Service Type</th>
+                <th>Travelers</th>
+                <th>Message</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for inquiry in inquiries %}
+              <tr>
+                <td>{{ inquiry.created_at.strftime('%b %d, %Y') if inquiry.created_at else 'N/A' }}</td>
+                <td>{{ inquiry.destination or '-' }}</td>
+                <td>{{ inquiry.service_type or 'General' }}</td>
+                <td>{{ inquiry.travelers or 1 }}</td>
+                <td style="max-width: 200px; overflow: hidden; text-overflow: ellipsis;">
+                  {{ inquiry.message[:50] + '...' if inquiry.message and inquiry.message|length > 50 else inquiry.message or '-' }}
+                </td>
+                <td>
+                  {% if inquiry.status == 'Pending' %}
+                    <span class="status status-pending">Pending</span>
+                  {% elif inquiry.status == 'Reviewed' %}
+                    <span class="status status-pending">Reviewed</span>
+                  {% elif inquiry.status == 'Quotation Sent' %}
+                    <span class="status status-confirmed">Quotation Sent</span>
+                  {% elif inquiry.status == 'Confirmed' %}
+                    <span class="status status-confirmed">Confirmed</span>
+                  {% elif inquiry.status == 'Completed' %}
+                    <span class="status status-completed">Completed</span>
+                  {% elif inquiry.status == 'Cancelled' %}
+                    <span class="status status-cancelled">Cancelled</span>
+                  {% else %}
+                    <span class="status status-pending">{{ inquiry.status }}</span>
+                  {% endif %}
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        {% else %}
+          <div class="empty-state">
+            <p>📭 You haven't made any inquiries yet.</p>
+            <a href="{{ url_for('contact') }}" class="btn btn-primary" style="margin-top: 15px;">Contact Us</a>
+          </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</body>
+</html>

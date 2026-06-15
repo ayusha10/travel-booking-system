@@ -18,3 +18,701 @@
     Show package.title, package.country, package.price, package.duration
   {% endfor %}
 -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Travel Packages - Gantabya</title>
+  <style>
+    /* Brand colors */
+    :root {
+      --teal: #064f63;
+      --teal-dark: #043b4d;
+      --teal-light: #0a6b84;
+      --gold: #c9a84c;
+      --gold-light: #dbba6a;
+      --ink: #0d1b2a;
+      --muted: #667085;
+      --line: #dfe5ee;
+      --panel: #ffffff;
+      --bg: #f6f8fb;
+      --success: #10b981;
+      --danger: #ef4444;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Segoe UI', Arial, Helvetica, sans-serif;
+      background: var(--bg);
+      color: var(--ink);
+    }
+
+    /* HEADER / NAVBAR */
+    nav {
+      min-height: 104px;
+      padding: 14px 48px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: rgba(255, 255, 255, 0.98);
+      border-bottom: 1px solid var(--line);
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .logo img {
+      width: 220px;
+      height: 76px;
+      object-fit: contain;
+      display: block;
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 28px;
+      list-style: none;
+    }
+
+    .nav-links a {
+      color: var(--teal-dark);
+      font-size: 14px;
+      font-weight: 700;
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+
+    .nav-links a:hover, .nav-links a.active {
+      color: var(--gold);
+    }
+
+    /* Hero Section */
+    .hero {
+      background: linear-gradient(135deg, var(--teal-dark), var(--teal));
+      color: white;
+      text-align: center;
+      padding: 60px 20px;
+    }
+
+    .hero h1 {
+      font-size: 48px;
+      margin-bottom: 15px;
+      animation: fadeInUp 0.6s ease;
+    }
+
+    .hero p {
+      font-size: 18px;
+      opacity: 0.9;
+      max-width: 600px;
+      margin: 0 auto;
+      animation: fadeInUp 0.6s ease 0.1s both;
+    }
+
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* Main Container */
+    .container {
+      max-width: 1400px;
+      margin: -40px auto 60px;
+      padding: 0 20px;
+    }
+
+    /* Search & Filter Section */
+    .filter-section {
+      background: var(--panel);
+      border-radius: 20px;
+      padding: 25px 30px;
+      margin-bottom: 40px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+    }
+
+    .filter-title {
+      font-size: 18px;
+      color: var(--teal-dark);
+      margin-bottom: 20px;
+      font-weight: 700;
+    }
+
+    .filter-grid {
+      display: flex;
+      gap: 20px;
+      flex-wrap: wrap;
+      align-items: flex-end;
+    }
+
+    .filter-group {
+      flex: 1;
+      min-width: 180px;
+    }
+
+    .filter-group label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 600;
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    .filter-group input, .filter-group select {
+      width: 100%;
+      padding: 12px 15px;
+      border: 2px solid var(--line);
+      border-radius: 12px;
+      font-family: inherit;
+      font-size: 14px;
+      transition: all 0.2s;
+    }
+
+    .filter-group input:focus, .filter-group select:focus {
+      outline: none;
+      border-color: var(--gold);
+    }
+
+    .btn-filter {
+      background: var(--teal);
+      color: white;
+      border: none;
+      padding: 12px 25px;
+      border-radius: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .btn-filter:hover {
+      background: var(--teal-dark);
+      transform: translateY(-2px);
+    }
+
+    /* Packages Grid */
+    .packages-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+      gap: 30px;
+    }
+
+    /* Package Card */
+    .package-card {
+      background: var(--panel);
+      border-radius: 20px;
+      overflow: hidden;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+      transition: transform 0.3s, box-shadow 0.3s;
+    }
+
+    .package-card:hover {
+      transform: translateY(-8px);
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+    }
+
+    .package-image {
+      position: relative;
+      height: 240px;
+      overflow: hidden;
+    }
+
+    .package-image img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.5s;
+    }
+
+    .package-card:hover .package-image img {
+      transform: scale(1.05);
+    }
+
+    .package-badge {
+      position: absolute;
+      top: 15px;
+      right: 15px;
+      background: var(--gold);
+      color: var(--teal-dark);
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .package-badge.featured {
+      background: var(--gold);
+    }
+
+    .package-content {
+      padding: 25px;
+    }
+
+    .package-title {
+      font-size: 22px;
+      color: var(--teal-dark);
+      margin-bottom: 8px;
+    }
+
+    .package-country {
+      display: inline-block;
+      background: var(--bg);
+      padding: 4px 12px;
+      border-radius: 15px;
+      font-size: 12px;
+      color: var(--muted);
+      margin-bottom: 15px;
+    }
+
+    .package-duration {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 15px;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .package-duration svg {
+      width: 18px;
+      height: 18px;
+      stroke: var(--gold);
+    }
+
+    .package-description {
+      color: var(--muted);
+      line-height: 1.6;
+      margin-bottom: 20px;
+      font-size: 14px;
+    }
+
+    .package-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-top: 1px solid var(--line);
+      padding-top: 20px;
+    }
+
+    .package-price {
+      font-size: 28px;
+      font-weight: 800;
+      color: var(--teal);
+    }
+
+    .package-price small {
+      font-size: 14px;
+      font-weight: normal;
+      color: var(--muted);
+    }
+
+    .btn-book {
+      background: linear-gradient(135deg, var(--teal), var(--teal-dark));
+      color: white;
+      border: none;
+      padding: 10px 24px;
+      border-radius: 30px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.3s;
+      text-decoration: none;
+      display: inline-block;
+    }
+
+    .btn-book:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(6, 79, 99, 0.3);
+    }
+
+    .btn-inquiry {
+      background: transparent;
+      border: 2px solid var(--line);
+      color: var(--teal);
+      padding: 8px 20px;
+      border-radius: 30px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s;
+      text-decoration: none;
+      display: inline-block;
+      font-size: 14px;
+    }
+
+    .btn-inquiry:hover {
+      border-color: var(--gold);
+      background: var(--gold);
+      color: white;
+    }
+
+    /* No Results */
+    .no-results {
+      text-align: center;
+      padding: 60px;
+      background: var(--panel);
+      border-radius: 20px;
+      color: var(--muted);
+    }
+
+    /* Flash Messages */
+    .flash {
+      padding: 15px 20px;
+      border-radius: 12px;
+      margin-bottom: 25px;
+      animation: slideDown 0.4s ease;
+    }
+
+    @keyframes slideDown {
+      from {
+        opacity: 0;
+        transform: translateY(-10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .flash.success {
+      background: #ecfdf5;
+      color: #065f46;
+      border: 1px solid #a7f3d0;
+    }
+
+    /* Footer */
+    footer {
+      background: var(--ink);
+      color: white;
+      text-align: center;
+      padding: 30px;
+      margin-top: 60px;
+    }
+
+    /* Quick Inquiry Modal */
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.5);
+      z-index: 1000;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .modal.active {
+      display: flex;
+    }
+
+    .modal-content {
+      background: white;
+      border-radius: 20px;
+      max-width: 500px;
+      width: 90%;
+      padding: 30px;
+      position: relative;
+      animation: modalSlideIn 0.3s ease;
+    }
+
+    @keyframes modalSlideIn {
+      from {
+        opacity: 0;
+        transform: translateY(-30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+
+    .modal-header h3 {
+      color: var(--teal-dark);
+      font-size: 24px;
+    }
+
+    .modal-close {
+      background: none;
+      border: none;
+      font-size: 28px;
+      cursor: pointer;
+      color: var(--muted);
+    }
+
+    .modal-body .form-group {
+      margin-bottom: 15px;
+    }
+
+    .modal-body input, .modal-body textarea, .modal-body select {
+      width: 100%;
+      padding: 12px;
+      border: 2px solid var(--line);
+      border-radius: 10px;
+    }
+
+    /* Responsive */
+    @media (max-width: 900px) {
+      nav {
+        padding: 12px 20px;
+        flex-direction: column;
+        gap: 12px;
+      }
+      .logo img { width: 190px; height: 66px; }
+      .nav-links {
+        width: 100%;
+        justify-content: center;
+        flex-wrap: wrap;
+        gap: 18px;
+      }
+      .hero h1 { font-size: 36px; }
+      .packages-grid {
+        grid-template-columns: 1fr;
+      }
+      .filter-grid {
+        flex-direction: column;
+      }
+      .filter-group {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAVIGATION -->
+  <nav>
+    <a class="logo" href="{{ url_for('home') }}">
+      <img src="{{ url_for('static', filename='Logo.jpg') }}" alt="Gantabya logo">
+    </a>
+    <ul class="nav-links">
+      <li><a href="{{ url_for('home') }}">Home</a></li>
+      <li><a href="{{ url_for('destination') }}">Destinations</a></li>
+      <li><a href="{{ url_for('packages') }}" class="active">Packages</a></li>
+      <li><a href="{{ url_for('track_booking') }}">Track Booking</a></li>
+      <li><a href="{{ url_for('contact') }}">Contact</a></li>
+    </ul>
+  </nav>
+
+  <!-- HERO SECTION -->
+  <div class="hero">
+    <h1>✈️ Explore Our Travel Packages</h1>
+    <p>Discover amazing destinations with our curated travel experiences. From luxury escapes to budget adventures.</p>
+  </div>
+
+  <!-- MAIN CONTENT -->
+  <div class="container">
+    <!-- Flash Messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+          <div class="flash {{ category if category else 'success' }}">{{ message }}</div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+
+    <!-- Search & Filter -->
+    <div class="filter-section">
+      <div class="filter-title">🔍 Find Your Perfect Trip</div>
+      <div class="filter-grid">
+        <div class="filter-group">
+          <label>Search Destination</label>
+          <input type="text" id="searchInput" placeholder="Search by country or title...">
+        </div>
+        <div class="filter-group">
+          <label>Sort By</label>
+          <select id="sortInput">
+            <option value="default">Default</option>
+            <option value="priceLow">Price: Low to High</option>
+            <option value="priceHigh">Price: High to Low</option>
+            <option value="name">Package Name</option>
+          </select>
+        </div>
+        <div class="filter-group">
+          <label>Max Price (Rs.)</label>
+          <input type="number" id="priceInput" placeholder="Any price" step="10000">
+        </div>
+        <div class="filter-group">
+          <button class="btn-filter" id="resetBtn">Reset Filters</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Packages Grid -->
+    <div class="packages-grid" id="packagesGrid">
+      {% if packages and packages|length > 0 %}
+        {% for package in packages %}
+        <div class="package-card" data-title="{{ package.title }}" data-country="{{ package.country }}" data-price="{{ package.price }}">
+          <div class="package-image">
+            {% if package.image %}
+              <img src="{{ url_for('static', filename='uploads/' + package.image) }}" alt="{{ package.title }}">
+            {% else %}
+              <img src="https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=400&h=250&fit=crop" alt="{{ package.title }}">
+            {% endif %}
+            {% if package.is_featured %}
+              <span class="package-badge featured">🌟 Featured</span>
+            {% endif %}
+          </div>
+          <div class="package-content">
+            <h3 class="package-title">{{ package.title }}</h3>
+            <span class="package-country">📍 {{ package.country }}</span>
+            
+            <div class="package-duration">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="10"/>
+                <polyline points="12 6 12 12 16 14"/>
+              </svg>
+              <span>{{ package.duration or '7 Days' }}</span>
+            </div>
+            
+            <p class="package-description">
+              {{ package.description[:120] + '...' if package.description and package.description|length > 120 else package.description or 'Experience the beauty and culture of this amazing destination with our carefully crafted package.' }}
+            </p>
+            
+            <div class="package-footer">
+              <div class="package-price">
+                ₹{{ "%.2f"|format(package.price) }}
+                <small>/ person</small>
+              </div>
+              <div style="display: flex; gap: 10px;">
+                <button class="btn-inquiry" onclick="openInquiryModal('{{ package.title }}')">Inquire</button>
+                <a href="{{ url_for('booking_confirm') }}?package={{ package.title }}&price={{ package.price }}" class="btn-book">Book Now</a>
+              </div>
+            </div>
+          </div>
+        </div>
+        {% endfor %}
+      {% else %}
+        <div class="no-results">
+          <p>No packages available at the moment.</p>
+          <p>Check back soon for amazing travel deals!</p>
+        </div>
+      {% endif %}
+    </div>
+  </div>
+
+  <!-- Quick Inquiry Modal -->
+  <div id="inquiryModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>Quick Inquiry</h3>
+        <button class="modal-close" onclick="closeInquiryModal()">&times;</button>
+      </div>
+      <div class="modal-body">
+        <form method="POST" action="{{ url_for('submit_inquiry') }}">
+          <input type="hidden" id="packageName" name="package_name">
+          <div class="form-group">
+            <input type="text" name="name" placeholder="Your Name" required>
+          </div>
+          <div class="form-group">
+            <input type="email" name="email" placeholder="Your Email" required>
+          </div>
+          <div class="form-group">
+            <input type="tel" name="phone" placeholder="Phone Number">
+          </div>
+          <div class="form-group">
+            <input type="date" name="departure_date" placeholder="Preferred Date">
+          </div>
+          <div class="form-group">
+            <input type="number" name="travelers" placeholder="Number of Travelers" value="1">
+          </div>
+          <div class="form-group">
+            <textarea name="message" rows="3" placeholder="Any special requests?"></textarea>
+          </div>
+          <button type="submit" class="btn-book" style="width: 100%;">Send Inquiry</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <footer>
+    <p>&copy; 2024 Gantabya Travel. All rights reserved. | Your journey begins here ✨</p>
+  </footer>
+
+  <!-- JavaScript for Filtering -->
+  <script>
+    // Filter and sort functionality
+    const searchInput = document.getElementById('searchInput');
+    const sortInput = document.getElementById('sortInput');
+    const priceInput = document.getElementById('priceInput');
+    const resetBtn = document.getElementById('resetBtn');
+    const packagesGrid = document.getElementById('packagesGrid');
+    
+    function filterAndSortPackages() {
+      const searchTerm = searchInput.value.toLowerCase();
+      const maxPrice = priceInput.value ? parseFloat(priceInput.value) : Infinity;
+      const sortBy = sortInput.value;
+      
+      let packages = Array.from(document.querySelectorAll('.package-card'));
+      
+      // Filter
+      packages = packages.filter(pkg => {
+        const title = pkg.dataset.title.toLowerCase();
+        const country = pkg.dataset.country.toLowerCase();
+        const price = parseFloat(pkg.dataset.price);
+        
+        const matchesSearch = title.includes(searchTerm) || country.includes(searchTerm);
+        const matchesPrice = price <= maxPrice;
+        
+        return matchesSearch && matchesPrice;
+      });
+      
+      // Sort
+      if (sortBy === 'priceLow') {
+        packages.sort((a, b) => parseFloat(a.dataset.price) - parseFloat(b.dataset.price));
+      } else if (sortBy === 'priceHigh') {
+        packages.sort((a, b) => parseFloat(b.dataset.price) - parseFloat(a.dataset.price));
+      } else if (sortBy === 'name') {
+        packages.sort((a, b) => a.dataset.title.localeCompare(b.dataset.title));
+      }
+      
+      // Reorder DOM
+      packages.forEach(pkg => packagesGrid.appendChild(pkg));
+    }
+    
+    // Event listeners
+    searchInput.addEventListener('input', filterAndSortPackages);
+    sortInput.addEventListener('change', filterAndSortPackages);
+    priceInput.addEventListener('input', filterAndSortPackages);
+    
+    resetBtn.addEventListener('click', () => {
+      searchInput.value = '';
+      sortInput.value = 'default';
+      priceInput.value = '';
+      filterAndSortPackages();
+    });
+    
+    // Modal functions
+    function openInquiryModal(packageTitle) {
+      document.getElementById('packageName').value = packageTitle;
+      document.getElementById('inquiryModal').classList.add('active');
+    }
+    
+    function closeInquiryModal() {
+      document.getElementById('inquiryModal').classList.remove('active');
+    }
+    
+    // Close modal on outside click
+    window.onclick = function(event) {
+      const modal = document.getElementById('inquiryModal');
+      if (event.target === modal) {
+        closeInquiryModal();
+      }
+    }
+  </script>
+</body>
+</html>

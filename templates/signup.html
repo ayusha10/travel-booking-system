@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <!-- Page setup: browser title and responsive mobile scaling -->
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sign Up - Gantabya</title>
+  <style>
+    /* Brand colors for this signup page */
+    :root {
+      --teal: #064f63;
+      --teal-dark: #043b4d;
+      --gold: #c9a84c;
+      --ink: #0d1b2a;
+      --muted: #667085;
+      --line: #dfe5ee;
+      --panel: #ffffff;
+      --bg: #f6f8fb;
+    }
+
+    /* Reset sizing so padding does not break widths */
+    * { box-sizing: border-box; }
+
+    /* Full-page background image with dark overlay */
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: Arial, Helvetica, sans-serif;
+      color: var(--ink);
+      background:
+        linear-gradient(120deg, rgba(4, 59, 77, 0.82), rgba(6, 79, 99, 0.66)),
+        url("https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=1600&q=80") center/cover no-repeat;
+    }
+
+    /* HEADER / NAVBAR: logo and public website links */
+    nav {
+      min-height: 104px;
+      padding: 14px 48px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: rgba(255, 255, 255, 0.94);
+      border-bottom: 1px solid rgba(223, 229, 238, 0.8);
+      box-shadow: 0 12px 30px rgba(13, 27, 42, 0.12);
+    }
+
+    /* Logo image size inside navbar */
+    .logo img {
+      width: 220px;
+      height: 76px;
+      object-fit: contain;
+      display: block;
+    }
+
+    /* Navbar link list */
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 22px;
+      list-style: none;
+      margin: 0;
+      padding: 0;
+    }
+
+    .nav-links a {
+      color: var(--teal-dark);
+      font-size: 14px;
+      font-weight: 700;
+      text-decoration: none;
+    }
+
+    .nav-links a:hover { color: var(--gold); }
+
+    /* Centers the signup card on the page */
+    .page {
+      min-height: calc(100vh - 104px);
+      display: grid;
+      place-items: center;
+      padding: 40px 20px;
+    }
+
+    /* Main signup form card */
+    .signup-card {
+      width: min(480px, 100%);
+      background: var(--panel);
+      border: 1px solid rgba(223, 229, 238, 0.92);
+      border-radius: 8px;
+      box-shadow: 0 24px 70px rgba(13, 27, 42, 0.28);
+      padding: 30px;
+    }
+
+    h1 {
+      margin: 0 0 8px;
+      font-size: 30px;
+      color: var(--teal-dark);
+    }
+
+    p {
+      margin: 0 0 24px;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    /* Form labels and inputs */
+    label {
+      display: block;
+      margin: 16px 0 7px;
+      font-weight: 700;
+      color: var(--ink);
+    }
+
+    input {
+      width: 100%;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 12px 13px;
+      font: inherit;
+      outline: none;
+    }
+
+    input:focus {
+      border-color: var(--teal);
+      box-shadow: 0 0 0 3px rgba(6, 79, 99, 0.12);
+    }
+
+    /* Signup submit button */
+    .btn {
+      width: 100%;
+      min-height: 44px;
+      margin-top: 22px;
+      border: 0;
+      border-radius: 8px;
+      background: linear-gradient(135deg, var(--teal-dark), var(--teal));
+      color: #ffffff;
+      font-weight: 800;
+      cursor: pointer;
+    }
+
+    .btn:hover { background: linear-gradient(135deg, #032f3d, var(--teal-dark)); }
+
+    /* Link below the form for existing users */
+    .login-row {
+      margin-top: 18px;
+      text-align: center;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .login-row a {
+      color: var(--teal);
+      font-weight: 800;
+      text-decoration: none;
+    }
+
+    /* Flash messages from Flask */
+    .flash {
+      padding: 12px;
+      border-radius: 8px;
+      margin-bottom: 14px;
+      background: #fff7ed;
+      color: #9a3412;
+      border: 1px solid #fed7aa;
+    }
+    
+    .flash.success {
+      background: #ecfdf5;
+      color: #065f46;
+      border-color: #a7f3d0;
+    }
+
+    /* Row for full name (two fields side by side if needed) */
+    .name-row {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 0;
+    }
+
+    /* Mobile layout: stack logo and links */
+    @media (max-width: 760px) {
+      nav {
+        padding: 12px 18px;
+        flex-direction: column;
+        gap: 12px;
+      }
+      .logo img { width: 190px; height: 66px; }
+      .nav-links {
+        width: 100%;
+        justify-content: center;
+        flex-wrap: wrap;
+        gap: 14px;
+      }
+      .page { min-height: calc(100vh - 148px); }
+      .signup-card { padding: 24px; }
+    }
+  </style>
+</head>
+<body>
+  <!-- HEADER / NAVBAR: customer can return to public pages from signup -->
+  <nav>
+    <a class="logo" href="{{ url_for('home') }}">
+      <img src="{{ url_for('static', filename='Logo.jpg') }}" alt="Gantabya logo">
+    </a>
+    <ul class="nav-links">
+      <li><a href="{{ url_for('home') }}">Home</a></li>
+      <li><a href="{{ url_for('destination') }}">Destinations</a></li>
+      <li><a href="{{ url_for('packages') }}">Packages</a></li>
+      <li><a href="{{ url_for('track_booking') }}">Track Booking</a></li>
+      <li><a href="{{ url_for('contact') }}">Contact</a></li>
+    </ul>
+  </nav>
+
+  <!-- SIGNUP SECTION: customer registration form -->
+  <main class="page">
+    <form class="signup-card" method="post">
+      <h1>Create Account</h1>
+      <p>Join Gantabya to book amazing travel packages and manage your trips.</p>
+
+      <!-- Flask flash messages appear here after signup errors/success -->
+      {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+          {% for category, message in messages %}
+            <div class="flash {% if category == 'success' %}success{% endif %}">{{ message }}</div>
+          {% endfor %}
+        {% endif %}
+      {% endwith %}
+
+      <!-- Full Name field -->
+      <label for="full_name">Full Name</label>
+      <input id="full_name" type="text" name="full_name" placeholder="Enter your full name" required>
+
+      <!-- Email field -->
+      <label for="email">Email Address</label>
+      <input id="email" type="email" name="email" placeholder="you@example.com" required>
+
+      <!-- Phone field -->
+      <label for="phone">Phone Number</label>
+      <input id="phone" type="tel" name="phone" placeholder="Optional">
+
+      <!-- Password field -->
+      <label for="password">Password</label>
+      <input id="password" type="password" name="password" placeholder="Create a strong password" required>
+
+      <!-- Address field -->
+      <label for="address">Address</label>
+      <input id="address" type="text" name="address" placeholder="Your city / country">
+
+      <button class="btn" type="submit">Sign Up</button>
+
+      <!-- Login link for customers who already have an account -->
+      <div class="login-row">
+        Already have an account? <a href="{{ url_for('login') }}">Login here</a>
+      </div>
+    </form>
+  </main>
+</body>
+</html>

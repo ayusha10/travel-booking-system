@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Login - Gantabya</title>
+    <style>
+        * { box-sizing: border-box; }
+        body {
+            margin: 0;
+            min-height: 100vh;
+            display: grid;
+            place-items: center;
+            font-family: "Segoe UI", Arial, Helvetica, sans-serif;
+            background:
+                linear-gradient(135deg, rgba(4, 59, 77, 0.9), rgba(6, 79, 99, 0.76)),
+                url("https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?w=1600&q=80") center/cover no-repeat;
+            color: #172033;
+            padding: 20px;
+        }
+        .login-panel {
+            width: min(420px, 100%);
+            background: #ffffff;
+            border: 1px solid #dfe5ee;
+            border-radius: 8px;
+            padding: 28px;
+            box-shadow: 0 24px 70px rgba(13, 27, 42, 0.32);
+        }
+        .login-logo {
+            width: 230px;
+            height: 80px;
+            object-fit: contain;
+            display: block;
+            margin-bottom: 18px;
+        }
+        h1 { margin: 0 0 6px; font-size: 28px; color: #043b4d; }
+        p { margin: 0 0 22px; color: #667085; }
+        label { display: block; font-weight: 700; margin: 14px 0 7px; }
+        input {
+            width: 100%;
+            border: 1px solid #dfe5ee;
+            border-radius: 8px;
+            padding: 12px;
+            font: inherit;
+        }
+        button {
+            width: 100%;
+            margin-top: 20px;
+            border: 0;
+            border-radius: 8px;
+            background: linear-gradient(135deg, #043b4d, #064f63);
+            color: #ffffff;
+            padding: 12px;
+            font-weight: 800;
+            cursor: pointer;
+        }
+        button:hover { background: linear-gradient(135deg, #032f3d, #043b4d); }
+        .flash {
+            padding: 11px 12px;
+            border-radius: 8px;
+            background: #fee2e2;
+            color: #991b1b;
+            margin-bottom: 12px;
+        }
+    </style>
+</head>
+<body>
+    <form class="login-panel" method="post">
+        <img class="login-logo" src="{{ url_for('static', filename='Logo.jpg') }}" alt="Gantabya logo">
+        <h1>Admin Login</h1>
+        <p>Manage bookings, customers, packages, and inquiries.</p>
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="flash">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+        <label for="username">Username</label>
+        <input id="username" name="username" required>
+        <label for="password">Password</label>
+        <input id="password" type="password" name="password" required>
+        <button type="submit">Login</button>
+    </form>
+</body>
+</html>

@@ -1,0 +1,41 @@
+{% extends "admin/base.html" %}
+{% block title %}Inquiries{% endblock %}
+{% block content %}
+<div class="topbar">
+    <div>
+        <h1>Inquiries</h1>
+        <p class="muted">Contact form and travel request messages.</p>
+    </div>
+</div>
+
+<div class="panel table-wrap">
+    <table>
+        <tr>
+            <th>Name</th>
+            <th>Contact</th>
+            <th>Trip Info</th>
+            <th>Message</th>
+            <th>Status</th>
+            <th>Actions</th>
+        </tr>
+        {% for inquiry in inquiries %}
+        <tr>
+            <td>{{ inquiry.name }}</td>
+            <td>{{ inquiry.email }}<br>{{ inquiry.phone or "-" }}</td>
+            <td>{{ inquiry.destination or inquiry.service_type or "-" }}<br>{{ inquiry.travelers or 1 }} traveler(s)</td>
+            <td>{{ inquiry.message or "-" }}</td>
+            <td><span class="badge {{ inquiry.status|lower }}">{{ inquiry.status }}</span></td>
+            <td>
+                <div class="actions">
+                    <a class="btn warning" href="{{ url_for('admin_update_status', id=inquiry.id, status='Contacted') }}">Contacted</a>
+                    <a class="btn success" href="{{ url_for('admin_update_status', id=inquiry.id, status='Resolved') }}">Resolved</a>
+                    <a class="btn danger" href="{{ url_for('admin_update_status', id=inquiry.id, status='Cancelled') }}">Cancel</a>
+                </div>
+            </td>
+        </tr>
+        {% else %}
+        <tr><td colspan="6" class="empty">No inquiries yet.</td></tr>
+        {% endfor %}
+    </table>
+</div>
+{% endblock %}

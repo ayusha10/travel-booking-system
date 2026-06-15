@@ -1,16 +1,19 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  <!-- Page setup: title, mobile scaling, and Google fonts -->
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Gantabya गन्तव्य – Explore the World with Confidence</title>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet"/>
   <style>
+    /* Reset default browser spacing and use predictable sizing */
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
+    /* Brand color variables used throughout the home page */
     :root {
-      --teal:    #1a6b7c;
-      --teal-dark: #124f5c;
+      --teal:    #064f63;
+      --teal-dark: #043b4d;
       --teal-light: #2a8fa5;
       --gold:    #c9a84c;
       --white:   #ffffff;
@@ -57,17 +60,19 @@
     .nav-links a:hover, .nav-links a.active { opacity: 1; color: #ffe2a2; border-color: #ffe2a2; }
     .nav-actions { display: flex; gap: 12px; align-items: center; }
     .btn-outline {
+      display: inline-flex; align-items: center; justify-content: center;
       padding: 8px 18px; border-radius: 6px;
       border: 1.5px solid rgba(255,255,255,0.78); color: var(--white);
       background: transparent; font-size: 14px; font-weight: 500;
-      cursor: pointer; transition: all 0.2s;
+      cursor: pointer; transition: all 0.2s; text-decoration: none;
     }
     .btn-outline:hover { background: rgba(255,255,255,0.16); color: var(--white); }
     .btn-solid {
+      display: inline-flex; align-items: center; justify-content: center;
       padding: 8px 20px; border-radius: 6px;
       background: var(--gold); color: #17323b;
       border: none; font-size: 14px; font-weight: 600;
-      cursor: pointer; transition: background 0.2s;
+      cursor: pointer; transition: background 0.2s; text-decoration: none;
     }
     .btn-solid:hover { background: #e0b556; }
 
@@ -353,30 +358,37 @@
 </head>
 <body>
 
-<!-- NAV -->
+<!-- HEADER / NAVBAR: logo, main links, login/contact, and booking button -->
 <nav>
+  <!-- Brand logo -->
   <div class="nav-logo">
     <img src="{{ url_for('static', filename='Logo.jpg') }}" alt="Gantabya logo" />
   </div>
+
+  <!-- Main website navigation links -->
   <ul class="nav-links">
-    <li><a href="/" class="active">Home</a></li>
-    <li><a href="/destinations">Destinations</a></li>
-    <li><a href="/tour-packages">Tour Packages</a></li>
-    <li><a href="/services">Services</a></li>
-    <li><a href="/track-booking">Track Booking</a></li>
+    <li><a href="{{ url_for('home') }}" class="active">Home</a></li>
+    <li><a href="{{ url_for('destination') }}">Destinations</a></li>
+    <li><a href="{{ url_for('packages') }}">Tour Packages</a></li>
+    <li><a href="{{ url_for('services') }}">Services</a></li>
+    <li><a href="{{ url_for('track_booking') }}">Track Booking</a></li>
   </ul>
+
+  <!-- Quick action buttons -->
   <div class="nav-actions">
-    <button class="btn-outline">Contact</button>
-    <button class="btn-solid">Book Now</button>
+    <a class="btn-outline" href="{{ url_for('login') }}">Login</a>
+    <a class="btn-outline" href="{{ url_for('contact') }}">Contact</a>
+    <a class="btn-solid" href="{{ url_for('packages') }}">Book Now</a>
   </div>
 </nav>
 
-<!-- HERO -->
+<!-- HERO SECTION: first screen visitors see -->
 <section class="hero">
   <div class="hero-content">
     <h1>Explore the World with Confidence</h1>
     <p>Experience luxury travel curated for the modern professional. From the peaks of Nepal to the beaches of Bali, we handle the details while you make the memories.</p>
   </div>
+  <!-- Search form UI shown on top of the hero image -->
   <div class="search-bar">
     <div class="search-field">
       <label>Destination</label>
@@ -411,7 +423,7 @@
   </div>
 </section>
 
-<!-- POPULAR DESTINATIONS -->
+<!-- POPULAR DESTINATIONS: four featured destination cards -->
 <section class="destinations-section">
   <div class="section-inner">
     <div class="destinations-header">
@@ -459,7 +471,7 @@
   </div>
 </section>
 
-<!-- INQUIRY PROCESS -->
+<!-- INQUIRY PROCESS: explains the travel request flow -->
 <section class="inquiry-section">
   <div class="section-inner">
     <span class="section-tag">How It Works</span>
@@ -493,7 +505,7 @@
   </div>
 </section>
 
-<!-- SERVICES -->
+<!-- SERVICES: highlights the main travel services -->
 <section class="services-section">
   <div class="section-inner">
     <span class="section-tag">What We Offer</span>
@@ -521,7 +533,7 @@
   </div>
 </section>
 
-<!-- CTA BANNER -->
+<!-- CTA BANNER: encourages users to start an inquiry -->
 <div class="cta-section">
   <div class="cta-inner">
     <div class="cta-left">
@@ -546,7 +558,7 @@
   </div>
 </div>
 
-<!-- TRAVELER MOMENTS -->
+<!-- TRAVELER MOMENTS: photo grid for travel inspiration -->
 <section class="moments-section">
   <div class="section-inner">
     <span class="section-tag">Community</span>
@@ -568,7 +580,7 @@
   </div>
 </section>
 
-<!-- FOOTER -->
+<!-- FOOTER: logo, useful links, newsletter, and copyright -->
 <footer>
   <div class="footer-grid">
     <div class="footer-brand">
@@ -617,7 +629,7 @@
   </div>
 </footer>
 
-<!-- Chat FAB -->
+<!-- CHAT BUTTON: floating button for future live chat feature -->
 <button class="chat-fab" title="Live Chat">
   💬
   <span class="badge"></span>

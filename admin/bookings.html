@@ -1,0 +1,45 @@
+{% extends "admin/base.html" %}
+{% block title %}Bookings{% endblock %}
+{% block content %}
+<div class="topbar">
+    <div>
+        <h1>Bookings</h1>
+        <p class="muted">Manage confirmed and pending travel bookings.</p>
+    </div>
+</div>
+
+<div class="panel table-wrap">
+    <table>
+        <tr>
+            <th>Booking No.</th>
+            <th>Customer</th>
+            <th>Package</th>
+            <th>Travelers</th>
+            <th>Travel Date</th>
+            <th>Amount</th>
+            <th>Status</th>
+            <th>Actions</th>
+        </tr>
+        {% for booking in bookings %}
+        <tr>
+            <td>{{ booking.booking_number or booking.id }}</td>
+            <td>{{ booking.customer_name }}<br>{{ booking.customer_email }}</td>
+            <td>{{ booking.package_name }}</td>
+            <td>{{ booking.travelers }}</td>
+            <td>{{ booking.travel_date }}</td>
+            <td>NPR {{ "%.2f"|format(booking.total_amount or 0) }}</td>
+            <td><span class="badge {{ booking.status|lower }}">{{ booking.status }}</span></td>
+            <td>
+                <div class="actions">
+                    <a class="btn success" href="{{ url_for('admin_update_booking', id=booking.id, status='Confirmed') }}">Confirm</a>
+                    <a class="btn secondary" href="{{ url_for('admin_update_booking', id=booking.id, status='Completed') }}">Complete</a>
+                    <a class="btn danger" href="{{ url_for('admin_update_booking', id=booking.id, status='Cancelled') }}">Cancel</a>
+                </div>
+            </td>
+        </tr>
+        {% else %}
+        <tr><td colspan="8" class="empty">No bookings yet.</td></tr>
+        {% endfor %}
+    </table>
+</div>
+{% endblock %}

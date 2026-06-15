@@ -1,0 +1,84 @@
+{% extends "admin/base.html" %}
+{% block title %}Dashboard{% endblock %}
+{% block content %}
+<div class="topbar">
+    <div>
+        <h1>Dashboard</h1>
+        <p class="muted">Welcome, {{ session.admin_name }}. Here is the latest booking activity.</p>
+    </div>
+    <a class="btn" href="{{ url_for('admin_add_package') }}">Add Package</a>
+</div>
+
+<div class="grid stats-grid">
+    <div class="stat-card">
+        <div class="stat-value">{{ stats.total_customers }}</div>
+        <div class="stat-label">Customers</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-value">{{ stats.total_packages }}</div>
+        <div class="stat-label">Packages</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-value">{{ stats.total_bookings }}</div>
+        <div class="stat-label">Bookings</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-value">{{ stats.pending_inquiries }}</div>
+        <div class="stat-label">Pending inquiries</div>
+    </div>
+</div>
+
+<div class="panel">
+    <h2>Recent Bookings</h2>
+    <div class="table-wrap">
+        <table>
+            <tr>
+                <th>No.</th>
+                <th>Customer</th>
+                <th>Package</th>
+                <th>Travel Date</th>
+                <th>Amount</th>
+                <th>Status</th>
+            </tr>
+            {% for booking in recent_bookings %}
+            <tr>
+                <td>{{ booking.booking_number or booking.id }}</td>
+                <td>{{ booking.customer_name }}</td>
+                <td>{{ booking.package_name }}</td>
+                <td>{{ booking.travel_date }}</td>
+                <td>NPR {{ "%.2f"|format(booking.total_amount or 0) }}</td>
+                <td><span class="badge {{ booking.status|lower }}">{{ booking.status }}</span></td>
+            </tr>
+            {% else %}
+            <tr><td colspan="6" class="empty">No bookings yet.</td></tr>
+            {% endfor %}
+        </table>
+    </div>
+</div>
+
+<div class="panel">
+    <h2>Recent Inquiries</h2>
+    <div class="table-wrap">
+        <table>
+            <tr>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Destination</th>
+                <th>Message</th>
+                <th>Status</th>
+            </tr>
+            {% for inquiry in recent_inquiries %}
+            <tr>
+                <td>{{ inquiry.name }}</td>
+                <td>{{ inquiry.email }}</td>
+                <td>{{ inquiry.destination or "-" }}</td>
+                <td>{{ inquiry.message or "-" }}</td>
+                <td><span class="badge {{ inquiry.status|lower }}">{{ inquiry.status }}</span></td>
+            </tr>
+            {% else %}
+            <tr><td colspan="5" class="empty">No inquiries yet.</td></tr>
+            {% endfor %}
+        </table>
+    </div>
+</div>
+{% endblock %}

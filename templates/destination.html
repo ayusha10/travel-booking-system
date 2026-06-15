@@ -1,16 +1,19 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  <!-- Page setup: browser title, mobile scaling, and Google fonts -->
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Destinations – Gantabya गन्तव्य</title>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700;800&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
   <style>
+    /* Reset default browser spacing so layout starts cleanly */
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
+    /* Brand colors used throughout this page */
     :root {
-      --teal: #1a6b7c;
-      --teal-dark: #124f5c;
+      --teal: #064f63;
+      --teal-dark: #043b4d;
       --teal-light: #2a8fa5;
       --gold: #c9a84c;
       --white: #ffffff;
@@ -26,24 +29,44 @@
       background: var(--white);
     }
 
-    /* NAV - Same as home */
+    /* NAV: top bar with logo, page links, and action buttons */
     nav {
       position: fixed; top: 0; left: 0; right: 0; z-index: 100;
       display: flex; align-items: center; justify-content: space-between;
-      padding: 0 56px;
-      height: 128px;
+      gap: 24px;
+      padding: 12px 56px;
+      min-height: 112px;
       background: linear-gradient(135deg, var(--teal-dark) 0%, var(--teal) 58%, var(--gold) 100%);
       backdrop-filter: blur(8px);
       border-bottom: 1px solid rgba(255,255,255,0.24);
       box-shadow: 0 10px 28px rgba(14, 42, 56, 0.18);
     }
-    .nav-logo { display: flex; align-items: center; line-height: 1; cursor: pointer; }
-    .nav-logo img {
-      width: 250px;
-      height: 112px;
-      object-fit: contain;
+    .nav-logo {
+      display: inline-flex;
+      align-items: center;
+      flex: 0 0 auto;
+      line-height: 1;
+      text-decoration: none;
+      background: rgba(255, 255, 255, 0.96);
+      border-radius: 8px;
+      padding: 8px 12px;
+      box-shadow: 0 8px 20px rgba(4, 59, 77, 0.18);
     }
-    .nav-links { display: flex; gap: 32px; list-style: none; }
+    .nav-logo img {
+      width: 210px;
+      height: 72px;
+      object-fit: contain;
+      display: block;
+    }
+    .nav-links {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 18px 28px;
+      list-style: none;
+      min-width: 0;
+    }
     .nav-links a {
       text-decoration: none; font-size: 14px; font-weight: 500;
       color: var(--white); opacity: 0.86;
@@ -51,22 +74,38 @@
       padding-bottom: 4px;
     }
     .nav-links a:hover, .nav-links a.active { opacity: 1; color: #ffe2a2; border-bottom: 2px solid #ffe2a2; }
+    .nav-actions {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      flex-wrap: wrap;
+      gap: 12px;
+      flex: 0 0 auto;
+    }
     .btn-outline {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
       padding: 8px 18px; border-radius: 6px;
       border: 1.5px solid rgba(255,255,255,0.78); color: var(--white);
       background: transparent; font-size: 14px; font-weight: 500;
       cursor: pointer;
+      text-decoration: none;
     }
     .btn-outline:hover { background: rgba(255,255,255,0.16); color: var(--white); }
     .btn-solid {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
       padding: 8px 20px; border-radius: 6px;
       background: var(--gold); color: #17323b;
       border: none; font-size: 14px; font-weight: 600;
       cursor: pointer;
+      text-decoration: none;
     }
     .btn-solid:hover { background: #e0b556; }
 
-    /* DESTINATIONS PAGE SPECIFIC STYLES */
+    /* PAGE HEADER: title section at the top of the destinations page */
     .page-header {
       background: linear-gradient(135deg, #0e2a38 0%, #1a5b6e 100%);
       padding: 184px 48px 60px;
@@ -86,7 +125,7 @@
       margin: 0 auto;
     }
 
-    /* Stats Banner */
+    /* STATS BANNER: small numbers below the page title */
     .stats-banner {
       display: flex;
       justify-content: center;
@@ -107,7 +146,7 @@
       color: rgba(255,255,255,0.7);
     }
 
-    /* Filter Section */
+    /* FILTER SECTION: continent buttons and search input */
     .filter-section {
       background: var(--white);
       padding: 30px 48px;
@@ -170,7 +209,7 @@
       font-weight: 600;
     }
 
-    /* Destinations Grid */
+    /* DESTINATIONS GRID: card layout where JavaScript places destination cards */
     .destinations-container {
       max-width: 1280px;
       margin: 0 auto;
@@ -280,7 +319,7 @@
       color: var(--white);
     }
 
-    /* Footer */
+    /* FOOTER: bottom area with logo, links, newsletter, and copyright */
     footer {
       background: var(--dark);
       color: rgba(255,255,255,0.7);
@@ -345,43 +384,167 @@
       margin: 32px auto 0;
       display: flex;
       justify-content: space-between;
+      gap: 16px;
       font-size: 12px;
       color: rgba(255,255,255,0.35);
     }
 
+    .footer-bottom-links {
+      display: flex;
+      gap: 18px;
+    }
+
+    .footer-bottom-links a {
+      color: rgba(255,255,255,0.45);
+      text-decoration: none;
+    }
+
+    .footer-socials {
+      display: flex;
+      gap: 10px;
+      margin-top: 16px;
+    }
+
+    .footer-socials a {
+      display: inline-flex;
+      width: 34px;
+      height: 34px;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid rgba(255,255,255,0.22);
+      border-radius: 50%;
+      color: rgba(255,255,255,0.72);
+      text-decoration: none;
+    }
+
+    .chat-fab {
+      position: fixed;
+      right: 24px;
+      bottom: 24px;
+      width: 52px;
+      height: 52px;
+      border: 0;
+      border-radius: 50%;
+      background: var(--teal);
+      color: var(--white);
+      font-size: 22px;
+      cursor: pointer;
+      box-shadow: 0 10px 24px rgba(4, 59, 77, 0.35);
+    }
+
+    /* LAPTOP/TABLET: reduce spacing and show two destination cards per row */
+    @media (max-width: 1180px) {
+      nav { padding: 12px 28px; gap: 16px; }
+      .nav-logo img { width: 180px; height: 62px; }
+      .nav-links { gap: 14px 18px; }
+      .nav-links a { font-size: 13px; }
+      .btn-outline, .btn-solid { padding: 8px 14px; }
+      .dest-grid { grid-template-columns: repeat(2, minmax(280px, 1fr)); }
+    }
+
+    /* TABLET: stack navbar and make filter controls easier to tap */
     @media (max-width: 900px) {
-      nav { height: 110px; padding: 0 20px; }
-      .nav-logo img { width: 195px; height: 96px; }
-      .nav-links { display: none; }
+      nav {
+        position: static;
+        align-items: center;
+        flex-direction: column;
+        padding: 14px 20px 18px;
+      }
+      .nav-logo img { width: 190px; height: 64px; }
+      .nav-links {
+        width: 100%;
+        display: flex;
+        gap: 10px 16px;
+      }
+      .nav-actions {
+        width: 100%;
+        justify-content: center;
+      }
+      .page-header { padding: 48px 20px 40px; }
+      .stats-banner { gap: 24px; flex-wrap: wrap; }
       .dest-grid { grid-template-columns: 1fr; }
-      .filter-section { padding: 20px; }
-      .filter-container { flex-direction: column; }
+      .filter-section { position: static; padding: 20px; }
+      .filter-container { flex-direction: column; align-items: stretch; }
+      .filter-group { justify-content: center; }
+      .search-box { width: 100%; }
+      .search-box input { flex: 1; width: auto; min-width: 0; }
+      .footer-grid { grid-template-columns: 1fr 1fr; gap: 28px; }
+      .destinations-container { padding: 28px 20px; }
+    }
+
+    /* MOBILE: use one-column layout and larger touch-friendly controls */
+    @media (max-width: 600px) {
+      nav { padding: 12px 14px 16px; }
+      .nav-logo { width: 100%; justify-content: center; }
+      .nav-logo img { width: 180px; height: 60px; }
+      .nav-links {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        text-align: center;
+      }
+      .nav-links a {
+        display: block;
+        padding: 8px 4px;
+      }
+      .nav-actions {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+      .nav-actions .btn-solid { grid-column: 1 / -1; }
+      .btn-outline, .btn-solid { width: 100%; min-height: 40px; }
+      .page-header h1 { font-size: 34px; }
+      .page-header p { font-size: 15px; }
+      .stats-banner {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 16px;
+      }
+      .filter-group {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+      .filter-btn { padding: 10px 12px; }
+      .search-box { flex-direction: column; }
+      .search-box button { min-height: 42px; }
+      .destinations-container { padding: 20px 14px; }
+      .dest-grid { gap: 20px; }
+      .dest-image { height: 210px; }
+      .dest-features { flex-wrap: wrap; gap: 8px; }
+      footer { padding: 42px 20px 28px; }
       .footer-grid { grid-template-columns: 1fr; }
-      .destinations-container { padding: 20px; }
-      .page-header { padding: 150px 20px 40px; }
+      .footer-brand-logo { width: 190px; height: 96px; }
+      .newsletter-form { flex-direction: column; }
+      .footer-bottom { flex-direction: column; }
+      .chat-fab { right: 16px; bottom: 16px; }
     }
   </style>
 </head>
 <body>
 
+<!-- HEADER / NAVBAR: appears at the top of the page -->
 <nav>
-  <div class="nav-logo" onclick="window.location.href='index.html'">
+  <!-- Logo links back to the home page -->
+  <a class="nav-logo" href="{{ url_for('home') }}">
     <img src="{{ url_for('static', filename='Logo.jpg') }}" alt="Gantabya logo" />
-  </div>
+  </a>
+
+  <!-- Main website navigation links -->
   <ul class="nav-links">
-    <li><a href="index.html">Home</a></li>
-    <li><a href="destinations.html" class="active">Destinations</a></li>
-    <li><a href="#">Tour Packages</a></li>
-    <li><a href="#">Services</a></li>
-    <li><a href="#">Track Booking</a></li>
+    <li><a href="{{ url_for('home') }}">Home</a></li>
+    <li><a href="{{ url_for('destination') }}" class="active">Destinations</a></li>
+    <li><a href="{{ url_for('packages') }}">Tour Packages</a></li>
+    <li><a href="{{ url_for('services') }}">Services</a></li>
+    <li><a href="{{ url_for('track_booking') }}">Track Booking</a></li>
   </ul>
+  <!-- Quick action buttons for customer login, contact, and packages -->
   <div class="nav-actions">
-    <button class="btn-outline">Contact</button>
-    <button class="btn-solid">Book Now</button>
+    <a class="btn-outline" href="{{ url_for('login') }}">Login</a>
+    <a class="btn-outline" href="{{ url_for('contact') }}">Contact</a>
+    <a class="btn-solid" href="{{ url_for('packages') }}">Book Now</a>
   </div>
 </nav>
 
-<!-- Destinations Page Content -->
+<!-- PAGE HEADER: main title and short introduction -->
 <div class="page-header">
   <h1>Explore Our Destinations</h1>
   <p>Discover handpicked locations from around the world, curated for unforgettable experiences</p>
@@ -401,6 +564,7 @@
   </div>
 </div>
 
+<!-- FILTER BAR: lets users filter/search destination cards -->
 <div class="filter-section">
   <div class="filter-container">
     <div class="filter-group">
@@ -417,12 +581,14 @@
   </div>
 </div>
 
+<!-- DESTINATION CARDS: JavaScript below fills this grid automatically -->
 <div class="destinations-container">
   <div id="destGrid" class="dest-grid">
     <!-- Destinations will be loaded here -->
   </div>
 </div>
 
+<!-- FOOTER: repeated bottom information and useful links -->
 <footer>
   <div class="footer-grid">
     <div class="footer-brand">
@@ -471,7 +637,7 @@
   </div>
 </footer>
 
-<!-- Chat FAB -->
+<!-- CHAT BUTTON: floating button for future live chat feature -->
 <button class="chat-fab" title="Live Chat">
   💬
   <span class="badge"></span>
@@ -480,7 +646,7 @@
 
 
 <script>
-  // Destination Data
+  // Destination data: each object becomes one card in the grid.
   const destinations = [
     { name: "Bali", country: "Indonesia", continent: "asia", price: 890, duration: "5 Days", rating: "4.8", image: "https://images.unsplash.com/photo-1537996194471-e657df975ab4?w=600&q=80", description: "Tropical paradise with stunning beaches, rice terraces, and spiritual culture.", features: ["Beaches", "Temples", "Surfing"] },
     { name: "Santorini", country: "Greece", continent: "europe", price: 1290, duration: "6 Days", rating: "4.9", image: "https://images.unsplash.com/photo-1533105079780-92b9be482077?w=600&q=80", description: "Iconic white-washed buildings with breathtaking sunset views over the Aegean Sea.", features: ["Sunset", "Wine", "Romantic"] },
@@ -495,6 +661,7 @@
   let currentContinent = "all";
   let currentSearch = "";
 
+  // Render destination cards after applying the selected filter/search.
   function renderDestinations() {
     let filtered = destinations;
     
@@ -543,7 +710,7 @@
     `).join("");
   }
   
-  // Filter buttons
+  // Filter buttons: update currentContinent when a filter is clicked.
   document.querySelectorAll('.filter-btn').forEach(btn => {
     btn.addEventListener('click', () => {
       document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
@@ -553,12 +720,13 @@
     });
   });
   
-  // Search functionality
+  // Search button: filters cards using the search input text.
   document.getElementById('searchBtn').addEventListener('click', () => {
     currentSearch = document.getElementById('searchInput').value;
     renderDestinations();
   });
   
+  // Enter key search: lets users press Enter instead of clicking Search.
   document.getElementById('searchInput').addEventListener('keyup', (e) => {
     if (e.key === 'Enter') {
       currentSearch = e.target.value;
@@ -566,7 +734,7 @@
     }
   });
   
-  // Initial render
+  // Initial render: shows all destinations when the page first loads.
   renderDestinations();
 </script>
 </body>

@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Admin Panel{% endblock %} - Gantabya</title>
+    <style>
+        :root {
+            --bg: #f6f8fb;
+            --panel: #ffffff;
+            --ink: #0d1b2a;
+            --muted: #667085;
+            --line: #dfe5ee;
+            --brand: #064f63;
+            --brand-dark: #043b4d;
+            --gold: #c9a84c;
+            --accent: #0e7490;
+            --danger: #dc2626;
+            --warning: #b45309;
+            --success: #15803d;
+            --radius: 8px;
+            --shadow: 0 10px 25px rgba(15, 23, 42, 0.08);
+        }
+
+        * { box-sizing: border-box; }
+        body {
+            margin: 0;
+            font-family: "Segoe UI", Arial, Helvetica, sans-serif;
+            color: var(--ink);
+            background: var(--bg);
+        }
+
+        a { color: inherit; }
+        .admin-shell {
+            display: grid;
+            grid-template-columns: 260px minmax(0, 1fr);
+            min-height: 100vh;
+        }
+
+        .sidebar {
+            background: linear-gradient(180deg, #043b4d 0%, #064f63 66%, #0d1b2a 100%);
+            color: #eef4ff;
+            padding: 20px;
+            position: sticky;
+            top: 0;
+            height: 100vh;
+            box-shadow: 14px 0 36px rgba(4, 59, 77, 0.18);
+        }
+
+        .brand-card {
+            background: rgba(255, 255, 255, 0.94);
+            border-radius: var(--radius);
+            padding: 12px;
+            margin-bottom: 14px;
+            box-shadow: 0 14px 32px rgba(0, 0, 0, 0.18);
+        }
+
+        .brand-logo {
+            width: 100%;
+            height: 74px;
+            object-fit: contain;
+            display: block;
+        }
+
+        .brand-subtitle {
+            color: rgba(255, 255, 255, 0.78);
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 26px;
+        }
+
+        .nav-link {
+            display: block;
+            text-decoration: none;
+            padding: 12px 14px;
+            border-radius: var(--radius);
+            margin-bottom: 6px;
+            color: rgba(255, 255, 255, 0.86);
+            font-weight: 600;
+            border: 1px solid transparent;
+        }
+
+        .nav-link:hover,
+        .nav-link.active {
+            background: rgba(255, 255, 255, 0.12);
+            border-color: rgba(201, 168, 76, 0.5);
+            color: #ffffff;
+        }
+
+        .nav-link.active {
+            box-shadow: inset 4px 0 0 var(--gold);
+        }
+
+        .logout-link {
+            margin-top: 24px;
+            background: rgba(220, 38, 38, 0.18);
+            color: #fecaca;
+        }
+
+        .main {
+            min-width: 0;
+            padding: 28px;
+            background:
+                radial-gradient(circle at top right, rgba(201, 168, 76, 0.12), transparent 28%),
+                var(--bg);
+        }
+
+        .topbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        h1, h2, h3, p { margin-top: 0; }
+        h1 { font-size: 30px; margin-bottom: 6px; color: var(--brand-dark); }
+        h2 { font-size: 20px; margin-bottom: 16px; }
+        .muted { color: var(--muted); }
+
+        .panel {
+            background: var(--panel);
+            border: 1px solid var(--line);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .grid {
+            display: grid;
+            gap: 16px;
+        }
+
+        .stats-grid {
+            grid-template-columns: repeat(4, minmax(160px, 1fr));
+            margin-bottom: 20px;
+        }
+
+        .stat-card {
+            background: var(--panel);
+            border: 1px solid var(--line);
+            border-radius: var(--radius);
+            padding: 18px;
+            border-top: 4px solid var(--gold);
+            box-shadow: var(--shadow);
+        }
+
+        .stat-value {
+            font-size: 30px;
+            font-weight: 800;
+            margin-bottom: 4px;
+            color: var(--brand);
+        }
+
+        .stat-label {
+            color: var(--muted);
+            font-size: 14px;
+        }
+
+        .table-wrap {
+            overflow-x: auto;
+        }
+
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            min-width: 720px;
+        }
+
+        th, td {
+            padding: 12px;
+            border-bottom: 1px solid var(--line);
+            text-align: left;
+            vertical-align: top;
+        }
+
+        th {
+            font-size: 13px;
+            color: var(--muted);
+            background: #f8fafc;
+        }
+
+        .actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 38px;
+            padding: 9px 12px;
+            border: 0;
+            border-radius: var(--radius);
+            background: var(--brand);
+            color: #ffffff;
+            text-decoration: none;
+            font-weight: 700;
+            cursor: pointer;
+            box-shadow: 0 8px 18px rgba(6, 79, 99, 0.18);
+        }
+
+        .btn:hover { background: var(--brand-dark); }
+        .btn.secondary { background: #e8eef7; color: var(--ink); }
+        .btn.danger { background: var(--danger); }
+        .btn.warning { background: var(--warning); }
+        .btn.success { background: var(--success); }
+
+        .badge {
+            display: inline-block;
+            padding: 5px 9px;
+            border-radius: 999px;
+            background: #e8eef7;
+            color: #334155;
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        .badge.pending { background: #fef3c7; color: #92400e; }
+        .badge.confirmed, .badge.resolved, .badge.completed { background: #dcfce7; color: #166534; }
+        .badge.cancelled { background: #fee2e2; color: #991b1b; }
+        .badge.contacted { background: #dbeafe; color: #1e40af; }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 16px;
+        }
+
+        label {
+            display: block;
+            font-weight: 700;
+            margin-bottom: 7px;
+        }
+
+        input, textarea, select {
+            width: 100%;
+            border: 1px solid var(--line);
+            border-radius: var(--radius);
+            padding: 11px 12px;
+            font: inherit;
+            background: #ffffff;
+        }
+
+        textarea { min-height: 120px; resize: vertical; }
+        .full { grid-column: 1 / -1; }
+
+        .check-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .check-row input { width: auto; }
+
+        .flash {
+            padding: 12px 14px;
+            border-radius: var(--radius);
+            margin-bottom: 14px;
+            background: #e0f2fe;
+            color: #075985;
+            border: 1px solid #bae6fd;
+        }
+
+        .empty {
+            color: var(--muted);
+            padding: 18px 0;
+        }
+
+        @media (max-width: 980px) {
+            .admin-shell { grid-template-columns: 1fr; }
+            .sidebar {
+                position: static;
+                height: auto;
+            }
+            .brand-card {
+                max-width: 260px;
+            }
+            .nav {
+                display: grid;
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+                gap: 8px;
+            }
+            .nav-link { margin-bottom: 0; }
+            .main { padding: 20px; }
+            .stats-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+        }
+
+        @media (max-width: 640px) {
+            .topbar { align-items: flex-start; flex-direction: column; }
+            .nav { grid-template-columns: 1fr; }
+            .stats-grid, .form-grid { grid-template-columns: 1fr; }
+            .main { padding: 16px; }
+            h1 { font-size: 24px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="admin-shell">
+        <aside class="sidebar">
+            <div class="brand-card">
+                <img class="brand-logo" src="{{ url_for('static', filename='Logo.jpg') }}" alt="Gantabya logo">
+            </div>
+            <div class="brand-subtitle">Travel admin panel</div>
+            <nav class="nav">
+                <a class="nav-link {% if request.endpoint == 'admin_dashboard' %}active{% endif %}" href="{{ url_for('admin_dashboard') }}">Dashboard</a>
+                <a class="nav-link {% if request.endpoint == 'admin_customers' %}active{% endif %}" href="{{ url_for('admin_customers') }}">Customers</a>
+                <a class="nav-link {% if request.endpoint in ['admin_packages', 'admin_add_package', 'admin_edit_package'] %}active{% endif %}" href="{{ url_for('admin_packages') }}">Packages</a>
+                <a class="nav-link {% if request.endpoint == 'admin_inquiries' %}active{% endif %}" href="{{ url_for('admin_inquiries') }}">Inquiries</a>
+                <a class="nav-link {% if request.endpoint == 'admin_bookings' %}active{% endif %}" href="{{ url_for('admin_bookings') }}">Bookings</a>
+                <a class="nav-link {% if request.endpoint == 'admin_reports' %}active{% endif %}" href="{{ url_for('admin_reports') }}">Reports</a>
+                <a class="nav-link logout-link" href="{{ url_for('admin_logout') }}">Logout</a>
+            </nav>
+        </aside>
+        <main class="main">
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="flash">{{ message }}</div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+            {% block content %}{% endblock %}
+        </main>
+    </div>
+</body>
+</html>

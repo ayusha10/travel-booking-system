@@ -31,6 +31,7 @@ def admin_required(view_func):
     return wrapper
 
 def ensure_database_schema():
+    """Ensure database has all required columns"""
     customer_columns = {
         "password": "ALTER TABLE customer ADD COLUMN password VARCHAR(200) DEFAULT ''",
         "phone": "ALTER TABLE customer ADD COLUMN phone VARCHAR(20)",
@@ -38,17 +39,51 @@ def ensure_database_schema():
         "created_at": "ALTER TABLE customer ADD COLUMN created_at DATETIME",
     }
 
+    booking_columns = {
+        "customer_phone": "ALTER TABLE booking ADD COLUMN customer_phone VARCHAR(20)",
+        "special_requests": "ALTER TABLE booking ADD COLUMN special_requests TEXT",
+        "booking_status": "ALTER TABLE booking ADD COLUMN booking_status VARCHAR(50) DEFAULT 'Pending'",
+        "payment_status": "ALTER TABLE booking ADD COLUMN payment_status VARCHAR(50) DEFAULT 'Pending'",
+        "paid_amount": "ALTER TABLE booking ADD COLUMN paid_amount FLOAT DEFAULT 0",
+        "created_at": "ALTER TABLE booking ADD COLUMN created_at DATETIME",
+    }
+
+    inquiry_columns = {
+        "phone": "ALTER TABLE inquiry ADD COLUMN phone VARCHAR(20)",
+        "departure_date": "ALTER TABLE inquiry ADD COLUMN departure_date VARCHAR(50)",
+        "travelers": "ALTER TABLE inquiry ADD COLUMN travelers INTEGER DEFAULT 1",
+        "created_at": "ALTER TABLE inquiry ADD COLUMN created_at DATETIME",
+    }
+
     with db.engine.begin() as connection:
         tables = {row[0] for row in connection.exec_driver_sql("SELECT name FROM sqlite_master WHERE type='table'")}
-        if "customer" not in tables:
-            return
-
-        existing_columns = {
-            row[1] for row in connection.exec_driver_sql("PRAGMA table_info(customer)")
-        }
-        for column, statement in customer_columns.items():
-            if column not in existing_columns:
-                connection.exec_driver_sql(statement)
+        
+        if "customer" in tables:
+            existing_columns = {row[1] for row in connection.exec_driver_sql("PRAGMA table_info(customer)")}
+            for column, statement in customer_columns.items():
+                if column not in existing_columns:
+                    try:
+                        connection.exec_driver_sql(statement)
+                    except:
+                        pass
+        
+        if "booking" in tables:
+            existing_columns = {row[1] for row in connection.exec_driver_sql("PRAGMA table_info(booking)")}
+            for column, statement in booking_columns.items():
+                if column not in existing_columns:
+                    try:
+                        connection.exec_driver_sql(statement)
+                    except:
+                        pass
+        
+        if "inquiry" in tables:
+            existing_columns = {row[1] for row in connection.exec_driver_sql("PRAGMA table_info(inquiry)")}
+            for column, statement in inquiry_columns.items():
+                if column not in existing_columns:
+                    try:
+                        connection.exec_driver_sql(statement)
+                    except:
+                        pass
 
 # ==================== FRONTEND ROUTES ====================
 
@@ -79,7 +114,8 @@ def contact():
             email=request.form['email'],
             phone=request.form.get('phone', ''),
             service_type="Contact",
-            message=request.form['message']
+            message=request.form['message'],
+            status="Pending"
         )
         db.session.add(inquiry)
         db.session.commit()
@@ -90,12 +126,20 @@ def contact():
 @app.route("/track_booking")
 def track_booking():
     booking = None
-    booking_number = request.args.get("booking_number", "").strip()
-    if booking_number:
-        booking = Booking.query.filter_by(booking_number=booking_number.upper()).first()
+    booking_id = request.args.get('booking_id', '')
+    
+    if booking_id:
+        # Search by booking number
+        booking = Booking.query.filter_by(booking_number=booking_id.upper()).first()
+        
         if not booking:
-            flash("No booking found for that number.", "warning")
-    return render_template("track_booking.html", booking=booking, booking_number=booking_number)
+            # Also try searching by ID if booking number not found
+            if booking_id.isdigit():
+                booking = Booking.query.get(int(booking_id))
+            if not booking:
+                flash("Booking not found. Please check your booking number.", "error")
+    
+    return render_template("track_booking.html", booking=booking, booking_id=booking_id)
 
 # ==================== AUTHENTICATION ====================
 
@@ -114,7 +158,8 @@ def signup():
             email=request.form['email'],
             password=hashed_password,
             phone=request.form.get('phone', ''),
-            address=request.form.get('address', '')
+            address=request.form.get('address', ''),
+            created_at=datetime.utcnow()
         )
         db.session.add(customer)
         db.session.commit()
@@ -135,6 +180,7 @@ def login():
         if customer:
             session['customer_id'] = customer.id
             session['customer_name'] = customer.full_name
+            session['customer_email'] = customer.email
             session['user_type'] = 'customer'
             flash(f"Welcome back {customer.full_name}!", "success")
             return redirect(url_for("profile"))
@@ -149,8 +195,8 @@ def profile():
         return redirect(url_for("login"))
     
     customer = Customer.query.get(session['customer_id'])
-    bookings = Booking.query.filter_by(customer_email=customer.email).all()
-    inquiries = Inquiry.query.filter_by(email=customer.email).all()
+    bookings = Booking.query.filter_by(customer_email=customer.email).order_by(Booking.id.desc()).all()
+    inquiries = Inquiry.query.filter_by(email=customer.email).order_by(Inquiry.id.desc()).all()
     
     return render_template("profile.html", customer=customer, bookings=bookings, inquiries=inquiries)
 
@@ -165,18 +211,22 @@ def logout():
 @app.route("/booking_confirm", methods=["GET", "POST"])
 def booking_confirm():
     if request.method == "POST":
-        # Generate booking number
+        # Generate unique booking number
         booking_num = ''.join(random.choices(string.ascii_uppercase + string.digits, k=8))
         
         booking = Booking(
             booking_number=booking_num,
-            customer_name=request.form['customer_name'],
-            customer_email=request.form['customer_email'],
-            package_name=request.form['package_name'],
-            travel_date=request.form['travel_date'],
-            travelers=int(request.form['travelers']),
-            total_amount=float(request.form['total_amount']),
-            status="Confirmed"
+            customer_name=request.form.get('first_name') + ' ' + request.form.get('last_name'),
+            customer_email=request.form.get('email'),
+            customer_phone=request.form.get('phone'),
+            package_name=request.form.get('package_name'),
+            travel_date=request.form.get('travel_date'),
+            travelers=int(request.form.get('travelers')),
+            total_amount=float(request.form.get('total_amount')),
+            special_requests=request.form.get('special_requests', ''),
+            booking_status="Confirmed",
+            status="Confirmed",
+            created_at=datetime.utcnow()
         )
         db.session.add(booking)
         db.session.commit()
@@ -184,7 +234,41 @@ def booking_confirm():
         flash(f"Booking confirmed! Your booking number is {booking_num}", "success")
         return redirect(url_for("profile"))
     
-    return render_template("booking_confirmation.html")
+    return render_template("booking_confirm.html")
+
+# ==================== INQUIRY ROUTES ====================
+
+@app.route("/submit_inquiry", methods=["POST"])
+def submit_inquiry():
+    name = request.form.get('name')
+    email = request.form.get('email')
+    phone = request.form.get('phone', '')
+    package_name = request.form.get('package_name', '')
+    departure_date = request.form.get('departure_date', '')
+    travelers = request.form.get('travelers', 1)
+    message = request.form.get('message', '')
+    
+    # Create new inquiry
+    inquiry = Inquiry(
+        name=name,
+        email=email,
+        phone=phone,
+        service_type="Package Inquiry",
+        destination=package_name,
+        departure_date=departure_date,
+        travelers=int(travelers) if travelers else 1,
+        message=f"Package: {package_name}\n\n{message}" if message else f"Package: {package_name}",
+        status="Pending",
+        created_at=datetime.utcnow()
+    )
+    
+    db.session.add(inquiry)
+    db.session.commit()
+    
+    flash("Thank you! Your inquiry has been sent. We'll contact you soon.", "success")
+    
+    # Redirect back to packages page
+    return redirect(url_for("packages"))
 
 # ==================== ADMIN ROUTES ====================
 
@@ -216,7 +300,7 @@ def admin_dashboard():
         'total_bookings': Booking.query.count(),
         'total_inquiries': Inquiry.query.count(),
         'pending_inquiries': Inquiry.query.filter_by(status="Pending").count(),
-        'confirmed_bookings': Booking.query.filter_by(status="Confirmed").count(),
+        'confirmed_bookings': Booking.query.filter_by(booking_status="Confirmed").count(),
         'total_revenue': db.session.query(db.func.coalesce(db.func.sum(Booking.total_amount), 0)).scalar()
     }
     
@@ -250,7 +334,8 @@ def admin_add_package():
             duration=request.form.get('duration', ''),
             description=request.form.get('description', ''),
             image=request.form.get('image', ''),
-            is_featured='is_featured' in request.form
+            is_featured='is_featured' in request.form,
+            created_at=datetime.utcnow()
         )
         db.session.add(package)
         db.session.commit()
@@ -296,7 +381,7 @@ def admin_inquiries():
 @app.route("/admin/update_status/<int:id>/<status>")
 @admin_required
 def admin_update_status(id, status):
-    allowed_statuses = {"Pending", "Contacted", "Resolved", "Cancelled", "Confirmed"}
+    allowed_statuses = {"Pending", "Reviewed", "Quotation Sent", "Confirmed", "Completed", "Cancelled"}
     if status not in allowed_statuses:
         flash("Invalid status.", "danger")
         return redirect(url_for("admin_inquiries"))
@@ -304,7 +389,7 @@ def admin_update_status(id, status):
     inquiry = Inquiry.query.get_or_404(id)
     inquiry.status = status
     db.session.commit()
-    flash(f"Inquiry status: {status}", "success")
+    flash(f"Inquiry status updated to: {status}", "success")
     return redirect(url_for("admin_inquiries"))
 
 @app.route("/admin/bookings")
@@ -322,6 +407,7 @@ def admin_update_booking(id, status):
         return redirect(url_for("admin_bookings"))
 
     booking = Booking.query.get_or_404(id)
+    booking.booking_status = status
     booking.status = status
     db.session.commit()
     flash(f"Booking marked as {status}.", "success")
@@ -330,7 +416,7 @@ def admin_update_booking(id, status):
 @app.route("/admin/reports")
 @admin_required
 def admin_reports():
-    status_rows = db.session.query(Booking.status, db.func.count(Booking.id)).group_by(Booking.status).all()
+    status_rows = db.session.query(Booking.booking_status, db.func.count(Booking.id)).group_by(Booking.booking_status).all()
     top_packages = (
         db.session.query(Booking.package_name, db.func.count(Booking.id), db.func.coalesce(db.func.sum(Booking.total_amount), 0))
         .group_by(Booking.package_name)
@@ -357,70 +443,69 @@ def admin_logout():
 # ==================== CREATE DEFAULT DATA ====================
 
 def create_default_data():
+    """Create default admin and sample packages"""
     # Create default admin
     if not Admin.query.filter_by(username="admin").first():
         admin = Admin(
             username="admin",
             email="admin@gantabya.com",
             password=hashlib.md5("admin123".encode()).hexdigest(),
-            full_name="Super Admin"
+            full_name="Super Admin",
+            created_at=datetime.utcnow()
         )
         db.session.add(admin)
     
-    # Create sample packages
+    # Create sample packages if none exist
     if Package.query.count() == 0:
         sample_packages = [
             Package(title="Dubai Adventure", country="UAE", price=89999, duration="5 Days", 
-                   description="Visit Burj Khalifa, Desert Safari", is_featured=True),
+                   description="Visit Burj Khalifa, Desert Safari with dinner, Dubai Frame, Miracle Garden, and luxury shopping. Includes 5-star hotel accommodation and daily breakfast.", 
+                   is_featured=True, created_at=datetime.utcnow()),
             Package(title="Paris Romance", country="France", price=129999, duration="7 Days",
-                   description="Eiffel Tower, Louvre Museum", is_featured=True),
+                   description="Eiffel Tower, Louvre Museum, Seine River cruise, Montmartre, Versailles Palace. Romantic getaway with charming hotel in city center.", 
+                   is_featured=True, created_at=datetime.utcnow()),
             Package(title="Bali Paradise", country="Indonesia", price=69999, duration="4 Days",
-                   description="Beaches, temples, and culture", is_featured=True),
+                   description="Beautiful beaches, Ubud temples, rice terraces, water sports, and cultural shows. Includes private villa stay.", 
+                   is_featured=True, created_at=datetime.utcnow()),
             Package(title="Swiss Alps", country="Switzerland", price=159999, duration="6 Days",
-                   description="Mountain views, train rides"),
+                   description="Matterhorn view, Jungfraujoch, Interlaken, Lucerne, scenic train rides. Alpine adventure with cozy mountain lodges.", 
+                   is_featured=False, created_at=datetime.utcnow()),
+            Package(title="Thailand Explorer", country="Thailand", price=49999, duration="5 Days",
+                   description="Bangkok temples, Pattaya beaches, Phi Phi Islands, Thai cuisine tour. Perfect budget-friendly tropical escape.", 
+                   is_featured=False, created_at=datetime.utcnow()),
+            Package(title="Japan Discovery", country="Japan", price=189999, duration="8 Days",
+                   description="Tokyo, Osaka, Kyoto, Mount Fuji, bullet train experience, cherry blossoms, sushi making class.", 
+                   is_featured=False, created_at=datetime.utcnow()),
         ]
         for p in sample_packages:
             db.session.add(p)
     
     db.session.commit()
 
-@app.route("/profile")
-def profile():
-    customer = Customer.query.get(session['customer_id'])
-    bookings = Booking.query.filter_by(customer_email=customer.email).all()
-    inquiries = Inquiry.query.filter_by(email=customer.email).all()
-    return render_template("profile.html", customer=customer, bookings=bookings, inquiries=inquiries)
+# ==================== ERROR HANDLERS ====================
 
-@app.route("/submit_inquiry", methods=["POST"])
-def submit_inquiry():
-    name = request.form.get('name')
-    email = request.form.get('email')
-    phone = request.form.get('phone', '')
-    package_name = request.form.get('package_name', '')
-    departure_date = request.form.get('departure_date', '')
-    travelers = request.form.get('travelers', 1)
-    message = request.form.get('message', '')
-    
-    # Create new inquiry
-    inquiry = Inquiry(
-        name=name,
-        email=email,
-        phone=phone,
-        service_type="Package Inquiry",
-        destination=package_name,
-        departure_date=departure_date,
-        travelers=int(travelers) if travelers else 1,
-        message=f"Package: {package_name}\n\n{message}" if message else f"Package: {package_name}",
-        status="Pending"
+@app.errorhandler(404)
+def not_found_error(error):
+    return render_template("404.html"), 404
+
+@app.errorhandler(500)
+def internal_error(error):
+    db.session.rollback()
+    return render_template("500.html"), 500
+
+# ==================== CONTEXT PROCESSORS ====================
+
+@app.context_processor
+def inject_now():
+    return {'now': datetime.utcnow()}
+
+@app.context_processor
+def inject_user():
+    return dict(
+        is_logged_in='customer_id' in session,
+        customer_name=session.get('customer_name'),
+        is_admin='admin_id' in session
     )
-    
-    db.session.add(inquiry)
-    db.session.commit()
-    
-    flash("Thank you! Your inquiry has been sent. We'll contact you soon.", "success")
-    
-    # Redirect back to packages page
-    return redirect(url_for("packages"))
 
 # ==================== RUN APP ====================
 
@@ -430,17 +515,33 @@ if __name__ == "__main__":
         ensure_database_schema()
         create_default_data()
         
-        print("\n" + "="*50)
-        print("GANTABYA DATABASE READY!")
-        print("="*50)
-        print(f"Tables: Customer, Admin, Package, Inquiry, Booking")
-        print(f"Packages: {Package.query.count()} packages loaded")
-        print("\nAdmin Login:")
-        print("   URL: http://127.0.0.1:5000/admin/login")
-        print("   Username: admin")
-        print("   Password: admin123")
-        print("\nCustomer Signup:")
-        print("   URL: http://127.0.0.1:5000/signup")
-        print("="*50 + "\n")
+        print("\n" + "="*60)
+        print("🌟 GANTABYA TRAVEL BOOKING SYSTEM - READY! 🌟")
+        print("="*60)
+        print(f"✅ Database Tables: Customer, Admin, Package, Inquiry, Booking")
+        print(f"✅ Packages Loaded: {Package.query.count()} packages")
+        print(f"✅ Customers Registered: {Customer.query.count()}")
+        print(f"✅ Total Bookings: {Booking.query.count()}")
+        print("\n" + "🔐" + "="*58)
+        print("🔐 ADMIN LOGIN CREDENTIALS")
+        print("="*60)
+        print("   📍 URL: http://127.0.0.1:5000/admin/login")
+        print("   👤 Username: admin")
+        print("   🔑 Password: admin123")
+        print("\n" + "👥" + "="*58)
+        print("👥 CUSTOMER ACCESS")
+        print("="*60)
+        print("   📍 Signup: http://127.0.0.1:5000/signup")
+        print("   📍 Login:  http://127.0.0.1:5000/login")
+        print("\n" + "📱" + "="*58)
+        print("📱 FRONTEND PAGES")
+        print("="*60)
+        print("   🏠 Home:        http://127.0.0.1:5000/")
+        print("   ✈️ Packages:    http://127.0.0.1:5000/packages")
+        print("   📍 Destinations: http://127.0.0.1:5000/destination")
+        print("   🛠️ Services:    http://127.0.0.1:5000/services")
+        print("   📞 Contact:     http://127.0.0.1:5000/contact")
+        print("   🔍 Track Booking: http://127.0.0.1:5000/track_booking")
+        print("="*60 + "\n")
     
     app.run(debug=True, use_reloader=False)
